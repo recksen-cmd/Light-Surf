@@ -1,0 +1,12 @@
+{
+  "frames": 10385280,
+  "sample_rate": 48000,
+  "duration": 216.36,
+  "shared_gain": 0.7901312508562817,
+  "pre_gain_peak": 1.113739013671875,
+  "rhythm": [
+    "Drums",
+    "Percussion"
+  ],
+  "bed": "All other supplied WAV stems"
+}
