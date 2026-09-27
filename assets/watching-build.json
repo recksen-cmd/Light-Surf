@@ -1,0 +1,20 @@
+{
+  "peak_db": [
+    -0.4,
+    -3.2,
+    -0.5
+  ],
+  "shared_gain_db": -0.7999999999999999,
+  "stems": [
+    "0 Lead Vocals.mp3",
+    "1 Backing Vocals.mp3",
+    "2 Drums.mp3",
+    "3 Bass.mp3",
+    "4 Guitar.mp3",
+    "5 Keyboard.mp3",
+    "6 Percussion.mp3",
+    "7 Strings.mp3",
+    "8 Synth.mp3",
+    "9 Other.mp3"
+  ]
+}
