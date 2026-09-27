@@ -29,7 +29,7 @@ Physics were compared against 20 snapshots from the archived R7 C implementation
 
 Branch: `codex/web-development`, based on uploaded commit `f88a2f6`.
 
-Hold Dive to ease beneath the surface; release to recover gradually. Underwater music softly reduces treble (up to 5 dB above 2.2 kHz), with a smooth transition. Airborne percussion behavior is retained.
+Dive retains the original crest-release behavior. Softer buoyancy applies below the surface, without a downward hold. Underwater music softly reduces treble (up to 5 dB above 2.2 kHz), with a smooth transition. Airborne percussion behavior is retained.
 
 Build: `node build.js`. Open `index.html` directly for the standalone game.
 Checks: `node tests/test.js`, `node tests/dive.js`, `node tests/music.js`, and `node tests/controls.js`. The old C snapshot files are historical references; this development physics intentionally differs.
