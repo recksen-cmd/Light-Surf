@@ -1,6 +1,6 @@
 'use strict';
 (() => {
- const button=document.getElementById('music'),FADE=6;
+ const button=document.getElementById('music'),FADE=4;
  let context,master,rhythm,loading,enabled=true,paused=false,grounded=true,ready=false,timer;
  let tracks=[],queue=[],nextStart=0,nextTrack=0,first=true;
  const incoming=Float32Array.from({length:128},(_,i)=>Math.sin(i/127*Math.PI/2));

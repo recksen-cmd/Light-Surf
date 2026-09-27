@@ -27,6 +27,6 @@ Physics were compared against 20 snapshots from the archived R7 C implementation
 
 ## Development soundtrack playlist
 
-Plastic Wave Boy alternates with Watching Me Close using a six-second equal-power volume crossfade. Both songs use aligned bed/percussion buses so airborne percussion fades still work. Pause freezes the audio clock, including transitions. The uploaded gameplay and physics are unchanged.
+Plastic Wave Boy alternates with Watching Me Close using a four-second equal-power volume crossfade. Both songs use aligned bed/percussion buses so airborne percussion fades still work. Pause freezes the audio clock, including transitions. The uploaded gameplay and physics are unchanged.
 
 Build with `node build.js`; verify with `node tests/music.js`. The generated `index.html` embeds both songs and runs on its own. This local development branch is not automatically published.
