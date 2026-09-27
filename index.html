@@ -72,14 +72,15 @@ const V={add:(a,b)=>a.map((v,i)=>v+b[i]),sub:(a,b)=>a.map((v,i)=>v-b[i]),mul:(a,
 (() => {
  const button=document.getElementById('music');
  let context,master,rhythm,loading,enabled=true,paused=false,grounded=true,ready=false;
- function label(){button.textContent=loading&&!ready?'Music loading':!enabled?'Music off':paused&&ready?'Music paused':ready?'Music on':'Play music';button.setAttribute('aria-pressed',String(enabled));button.dataset.musicState=ready?(paused?'paused':enabled?'playing':'muted'):'waiting';button.dataset.arrangement=grounded?'full':'air';button.title='Plastic Wave Boy · percussion drops out in flight and returns on landing';}
+ function label(){button.textContent=loading&&!ready?'Music loading':!enabled?'Music off':paused&&ready?'Music paused':ready&&context.state==='running'?'Music on':'Music on · tap to start';button.setAttribute('aria-pressed',String(enabled));button.dataset.musicState=ready?(paused?'paused':!enabled?'muted':context.state==='running'?'playing':'waiting-for-gesture'):'waiting';button.dataset.arrangement=grounded?'full':'air';button.title='Plastic Wave Boy · percussion drops out in flight and returns on landing';}
  function mix(){if(!ready)return;master.gain.setTargetAtTime(enabled?.7:0,context.currentTime,.04);rhythm.gain.setTargetAtTime(grounded?1:0,context.currentTime,.12);}
- async function sync(){if(!context)return;mix();if(paused)await context.suspend();else await context.resume();label();}
+ async function sync(){if(!context)return;mix();if(paused)await context.suspend();else void context.resume().then(label).catch(label);label();}
  async function unlock(){
   if(context){await sync();return;}
   try{
    context=new (window.AudioContext||window.webkitAudioContext)();
-   await context.resume();
+   context.onstatechange=label;
+   void context.resume().then(label).catch(label);
    loading=true;label();
    const encoded=JSON.parse(document.getElementById('music-data').textContent);
    const decode=async text=>{const bytes=Uint8Array.from(atob(text),c=>c.charCodeAt(0));return context.decodeAudioData(bytes.buffer);};
@@ -92,11 +93,12 @@ const V={add:(a,b)=>a.map((v,i)=>v+b[i]),sub:(a,b)=>a.map((v,i)=>v-b[i]),mul:(a,
    ready=true;button.dataset.duration=String(buffers[0].duration);button.dataset.aligned='true';await sync();
   }catch(e){button.textContent='Retry music';button.title=e.message;loading=false;ready=false;if(context)await context.close();context=null;}
  }
- function gesture(e){if(e.target!==button&&!context)void unlock();}
+ function gesture(e){if(e.target!==button&&enabled&&(!context||context.state!=='running'))void unlock();}
  document.addEventListener('pointerdown',gesture);document.addEventListener('keydown',gesture);
- button.onclick=()=>{if(ready)enabled=!enabled;void unlock();};
+ button.onclick=()=>{if(ready&&(!enabled||paused||context.state==='running'))enabled=!enabled;else enabled=true;void unlock();};
  window.soundtrack={setPaused(value){paused=value;void sync();label();},setGrounded(value){if(grounded!==value){grounded=value;mix();label();}}};
  label();
+ void unlock();
 })();
 
 'use strict';
