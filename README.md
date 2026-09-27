@@ -6,7 +6,9 @@ The complete game and **Plastic Wave Boy** soundtrack are embedded in `index.htm
 
 ## Play
 
-Open the repository's GitHub Pages link, or download `index.html` and open it in a WebGL-capable browser. Click or press a key to enable music.
+**[Play Light Surf](https://recksen-cmd.github.io/Light-Surf/)**
+
+Or download `index.html` and open it in a WebGL-capable browser. Click or press a key to enable music.
 
 - **Arrow keys / WASD:** carve, dive, float.
 - **Space / Z:** hold the edge.
