@@ -30,3 +30,9 @@ Physics were compared against 20 snapshots from the archived R7 C implementation
 Plastic Wave Boy alternates with Watching Me Close using a four-second equal-power volume crossfade. Both songs use aligned bed/percussion buses so airborne percussion fades still work. Pause freezes the audio clock, including transitions. The uploaded gameplay and physics are unchanged.
 
 Build with `node build.js`; verify with `node tests/music.js`. The generated `index.html` embeds both songs and runs on its own. This local development branch is not automatically published.
+
+## Phone motion controls
+
+On a phone, tap Start surfing, allow motion access when prompted, and hold comfortably during calibration. Tilt sideways to carve and forward/back to dive/float. Tilt on/off and Recenter are in the toolbar. Rotation and returning to the page recalibrate the neutral position. The touch stick overrides tilt while dragging and remains available if sensors or permission are unavailable. Use HTTPS for motion access. Sensor readings stay on the device.
+
+Validated with simulated permissions, orientation samples, rotation and stale-input checks; physical iPhone/Android testing remains pending.
