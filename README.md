@@ -36,3 +36,9 @@ Build with `node build.js`; verify with `node tests/music.js`. The generated `in
 On a phone, tap Start surfing, allow motion access when prompted, and hold comfortably during calibration. Tilt sideways to carve and forward/back to dive/float. Tilt on/off and Recenter are in the toolbar. Rotation and returning to the page recalibrate the neutral position. The touch stick overrides tilt while dragging and remains available if sensors or permission are unavailable. Use HTTPS for motion access. Sensor readings stay on the device.
 
 Validated with simulated permissions, orientation samples, rotation and stale-input checks; physical iPhone/Android testing remains pending.
+
+## Water and flight effects
+
+Integrated from the testing experiment: directional wake channels and ridges with foam, chorus light sweeps and landing glow, high-launch space shading with expanded stars, and small golden falling sparks. Particles pause, reset and rebase with gameplay. Plastic Wave Boy uses confirmed chorus ranges 45–64.97, 107.83–142.27, and 162–180.03 seconds; Watching Me Close has no confirmed cue ranges. The playlist clock selects the correct track through four-second crossfades. No chorus review button or browser-local cue override is included.
+
+Wake relief now participates in board contact, so old R7 trajectory snapshot equivalence no longer applies. Updated checks verify finite bounded movement, landing continuity, grip reducing launches, water derivatives, cue boundaries, input handling and soundtrack transitions.

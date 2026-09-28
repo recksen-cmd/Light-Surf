@@ -2,13 +2,13 @@
    Fixed 120 Hz simulation; rendering never changes the simulation step. */
 'use strict';
 const Physics = (() => {
+const wakeField=typeof WaterEffects!=='undefined'?WaterEffects:require('./water-effects.js');
 const TAU=Math.PI*2, clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const table=Float32Array.from({length:2049},(_,i)=>Math.sin(i*TAU/2048));
 function sincos(phase){const c=phase*2048/TAU,n=Math.floor(c),f=c-n,i=n&2047,j=(i+512)&2047;return [table[i]+f*(table[i+1]-table[i]),table[j]+f*(table[j+1]-table[j])];}
 function wave(x,z,time){const w={height:0,dx:0,dz:0,dt:0,wake:0};for(const [a,b,c,d] of [[42,1,9,-3],[19,-5,21,-7],[6,19,7,5]]){const kx=b*TAU/8192,kz=c*TAU/8192,om=d*TAU/256,[sn,cs]=sincos(x*kx+z*kz+time*om);w.height+=a*sn;w.dx+=a*cs*kx;w.dz+=a*cs*kz;w.dt+=a*cs*om;}return w;}
-function surface(s,x,z){const w=wave(x,z,s.time);let h=0,dx=0,dz=0,dt=0;
- for(const p of s.wake){if(p.amplitude<=0)continue;const px=x-p.x,pz=z-p.z;if(Math.abs(px)>p.bound_x||Math.abs(pz)>p.bound_z)continue;const along=(px*p.fx+pz*p.fz)/34;if(Math.abs(along)>=1)continue;const side=px*p.fz-pz*p.fx,a=1-along*along,sa=a*a*a,da=-6*along*a*a/34;
-  for(const sign of [-1,1]){const across=(side-sign*p.spread)/14;if(Math.abs(across)>=1)continue;const [sn,cs]=sincos(across*TAU*.5),b=1-across*across,sb=b*b*cs,db=(-4*across*b*cs-b*b*TAU*.5*sn)/14,v=p.amplitude*sa*sb,u=p.amplitude*da*sb,t=p.amplitude*sa*db;h+=v;dx+=u*p.fx+t*p.fz;dz+=u*p.fz-t*p.fx;dt+=p.amplitude_dt*sa*sb-t*sign*8;}}
+function surface(s,x,z){const w=wave(x,z,s.time);const relief=wakeField.sample(s,x,z);let h=relief.height,dx=relief.dx,dz=relief.dz,dt=relief.dt;
+ w.foam=relief.foam;
  if(s.splash_strength>0&&s.splash_age<.9){const age=s.splash_age,radius=18+30*age,px=x-s.splash_x,pz=z-s.splash_z,inv=1/(radius*radius),q=(px*px+pz*pz)*inv;if(q<1){const u=age/.9,fade=1-u,b=1-q,amp=s.splash_strength*16*u*u*fade*fade,ad=s.splash_strength*32*u*fade*(1-2*u)/.9,shape=-b*b*b*(1-5*q),der=b*b*(8-20*q);h+=amp*shape;dx+=amp*der*2*px*inv;dz+=amp*der*2*pz*inv;dt+=ad*shape-amp*der*2*q*30/radius;}}
  let scale=1/(1+Math.abs(h)*.1);w.wake=h*scale;w.height+=w.wake;scale*=scale;w.dx+=dx*scale;w.dz+=dz*scale;w.dt+=dt*scale;return w;}
 function emptyWake(){return {x:0,z:0,fx:0,fz:0,age:0,strength:0,spread:0,amplitude:0,amplitude_dt:0,bound_x:0,bound_z:0};}
@@ -23,7 +23,7 @@ function step(s,input,dt=1/120){const steer=clamp(input.steer,-1,1),posture=clam
  if(s.grounded){const cg=input.crouch?140:18+(posture>0?75:9)*posture,previous=s.velocity.y+s.sink_velocity;if(previous-tangent>cg*dt&&previous>3&&s.sink<.4&&s.splash_age>.3){s.grounded=false;s.sink=s.sink_velocity=0;s.air_time=0;s.launches++;}else{s.sink_velocity+=(tangent-previous)*.2;const deep=Math.max(0,s.sink-4),drag=6+.045*Math.abs(s.sink_velocity)+2*deep,buoyancy=22*s.sink+30*deep*deep;s.sink_velocity+=(-buoyancy-drag*s.sink_velocity)*dt;s.sink+=s.sink_velocity*dt;if(s.sink>12){s.sink=12;s.sink_velocity=Math.min(0,s.sink_velocity);}if(s.sink<-1.2){s.sink=-1.2;s.sink_velocity=Math.max(0,s.sink_velocity);}s.position.y=contact-s.sink;s.velocity.y=tangent-s.sink_velocity;}}
  if(!s.grounded){s.air_time+=dt;s.velocity.y-=gravity*dt;s.position.y+=s.velocity.y*dt;if(s.position.y<=contact&&s.velocity.y<=tangent){const impact=Math.max(0,tangent-s.velocity.y),slope=w.dx*fx+w.dz*fz,alignment=clamp(1-Math.abs(s.pitch-Math.atan(slope))/.65,0,1),carry=Math.max(0,s.velocity.y*slope)/(1+slope*slope);s.speed=clamp(s.speed+Math.min(carry*.45,24)*alignment,60,220);s.grounded=true;s.sink=clamp(contact-s.position.y,0,12);s.sink_velocity=impact;s.position.y=contact-s.sink;s.velocity.y=tangent-s.sink_velocity;if(impact>12){s.splash_age=0;s.splash_strength=clamp(impact/30,0,4);s.splash_x=s.position.x;s.splash_y=w.height;s.splash_z=s.position.z;}s.landings++;}}
  const target=s.grounded?Math.atan(w.dx*fx+w.dz*fz):clamp(Math.atan(s.velocity.y/(s.speed+.01))-posture*.7,-1.1,1.1);s.pitch+=(target-s.pitch)*dt*6;
- if(s.grounded){s.wake_clock+=dt;if(s.wake_clock>=.16){s.wake_clock-=.16;s.wake[s.wake_head]={...emptyWake(),x:s.position.x-fx*36,z:s.position.z-fz*36,fx,fz,strength:4.5*(s.speed/125)*(.85+Math.abs(s.lean)*.4)};s.wake_head=(s.wake_head+1)%24;}}else s.wake_clock=.16;
+ if(s.grounded){s.wake_clock+=dt;if(s.wake_clock>=.16){s.wake_clock-=.16;const velocityLength=Math.hypot(s.velocity.x,s.velocity.z)||1,wfx=s.velocity.x/velocityLength,wfz=s.velocity.z/velocityLength;s.wake[s.wake_head]={...emptyWake(),x:s.position.x-wfx*36,z:s.position.z-wfz*36,fx:wfx,fz:wfz,bias:clamp(s.lean*.6,-.3,.3),strength:4.5*(s.speed/125)*(.85+Math.abs(s.lean)*.4)};s.wake_head=(s.wake_head+1)%24;}}else s.wake_clock=.16;
 }
 return {reset,step,wave,surface,rebase,clamp};
 })();

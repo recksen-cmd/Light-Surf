@@ -51,6 +51,6 @@
   }catch(e){clearInterval(timer);button.textContent='Retry music';button.title=e.message;loading=false;ready=false;if(context)await context.close();context=null;}
  }
  button.onclick=()=>{if(ready&&(!enabled||paused||context.state==='running'))enabled=!enabled;else enabled=true;void unlock();};
- window.soundtrack={start(){paused=false;return unlock();},setPaused(value){paused=value;void sync();label();},setGrounded(value){if(grounded!==value){grounded=value;mix();label();}}};
+ window.soundtrack={playback(){if(!ready)return null;const active=queue.filter(x=>x.start<=context.currentTime&&x.end>context.currentTime).at(-1);return active?{title:active.title,position:context.currentTime-active.start}:null;},start(){paused=false;return unlock();},setPaused(value){paused=value;void sync();label();},setGrounded(value){if(grounded!==value){grounded=value;mix();label();}}};
  label();
 })();

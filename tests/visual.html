@@ -1,0 +1,3 @@
+<!doctype html><title>Visual effects check</title><canvas id="game" width="960" height="720"></canvas><p id="result"></p><script src="../src/water-effects.js"></script><script src="../src/physics.js"></script><script src="../src/renderer.js"></script><script>
+try{const s=Physics.reset(),r=new SurfRenderer(document.getElementById('game'));for(let i=0;i<180;i++)Physics.step(s,{steer:.4,drive:0,crouch:true});s.grounded=false;s.position.y+=170;s.velocity.y=70;r.reset(s);for(let i=0;i<60;i++)r.update(s,1/60);r.render(s,WaterEffects.cue(49));document.getElementById('result').textContent='Space '+r.space+'; particles '+r.motes.length+'; chorus '+WaterEffects.cue(49).amount;}catch(e){document.getElementById('result').textContent=e.stack;}
+</script>

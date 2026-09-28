@@ -6,7 +6,7 @@ function element(){return {hidden:false,style:{},classList:{toggle(){},add(){},r
 const document={getElementById:id=>elements[id]??=element(),addEventListener:(n,f)=>docEvents[n]=f,hidden:false};
 const window={addEventListener:(n,f)=>events[n]=f};
 class Renderer{constructor(){this.eye=[0,0,0];this.drawMs=0;this.triangles=1;}reset(){}update(){}render(){}}
-const ctx=vm.createContext({Physics:P,SurfRenderer:Renderer,document,window,navigator:{getGamepads:()=>pads},HTMLButtonElement:class{},requestAnimationFrame:f=>nextFrame=f,console});
+const ctx=vm.createContext({Physics:P,WaterEffects:require('../src/water-effects.js'),SurfRenderer:Renderer,document,window,navigator:{getGamepads:()=>pads},HTMLButtonElement:class{},requestAnimationFrame:f=>nextFrame=f,console});
 vm.runInContext(fs.readFileSync(require('node:path').join(__dirname,'../src/game.js'),'utf8'),ctx);
 const key=(code,type='keydown')=>events[type]({code,preventDefault(){},target:{},repeat:false});
 const frames=n=>{for(let i=0;i<n;i++){time+=1000/60;nextFrame(time);}};
